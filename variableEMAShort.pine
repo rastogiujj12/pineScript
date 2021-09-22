@@ -1,0 +1,44 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © rastogiujj12
+
+//@version=4
+strategy("Variable EMA short", overlay=true)
+
+numberOfCandles = input(title="Number of candles", type=input.integer, defval=10)
+emaNumberOfCandles = input(title="EMA Number of candles", type=input.integer, defval=13)
+
+closedBelowEMA = true
+atleastOneCandleHighOverEMA = false
+EMAVal = ema(close, 13)
+// closedBelowPreviousLow = true
+
+
+for counter = 1 to 10
+    if(close[counter]>EMAVal)
+        closedBelowEMA := false
+    if(high[counter]>EMAVal)
+        atleastOneCandleHighOverEMA := true
+    // if(low[counter]<close)
+        // closedBelowPreviousLow := false
+        
+profit = 0.07
+trailingStop = 0.05
+stopLoss = 0.05
+
+profitTaken = (close*profit)/syminfo.mintick
+closingPrice = (close*trailingStop)/syminfo.mintick
+stopLossTicks = (close*stopLoss)/syminfo.mintick
+
+
+entryCondition = closedBelowEMA and atleastOneCandleHighOverEMA and ema(close,13)<ema(close,50) and ema(close,50)<ema(close,100)
+if (entryCondition)
+    strategy.entry("short", strategy.short)
+
+strategy.exit(tostring(closingPrice),"short",trail_points=profitTaken, trail_offset=closingPrice, loss=stopLossTicks)
+
+
+//strategy.exit("short", profit=close*0.07/syminfo.mintick,when=close>ema(close, 50))
+
+// shortCondition = crossunder(sma(close, 14), sma(close, 28))
+// if (shortCondition)
+//     strategy.entry("My Short Entry Id", strategy.short)
