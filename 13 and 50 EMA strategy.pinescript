@@ -1,0 +1,29 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © rastogiujj12
+//@version=4
+strategy("13and50ema-NSE", overlay=true)
+
+
+
+longCondition = close> ema(close, 13) and ema(close,13)> ema(close,50) and ema(close, 50)>ema(close, 100) and open<close
+
+profit = 0.01
+trailingStop = 0.008
+stopLoss = 0.008
+
+profitTaken = (close*profit)/syminfo.mintick
+closingPrice = (close*trailingStop)/syminfo.mintick
+stopLossTicks = (close*stopLoss)/syminfo.mintick
+
+if (longCondition)
+    strategy.entry("long", strategy.long)
+    
+strategy.exit("exitlong","long",trail_points=profitTaken, loss=stopLossTicks)
+
+shortCondition = close< ema(close, 13) and ema(close,13)< ema(close,50) and ema(close, 50)<ema(close, 100) and open>close 
+
+
+if (shortCondition)
+    strategy.entry("short", strategy.short)
+    
+strategy.exit("exitshort","short",trail_points=profitTaken, loss=stopLossTicks)
